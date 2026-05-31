@@ -113,6 +113,13 @@
   white-space: nowrap;
 }
 
+.td-reason-short {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ===== ステータスバッジ ===== */
 .status-badge {
   display: inline-block;
@@ -250,6 +257,17 @@
 
 .modal-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
 .modal-field textarea.tall { min-height: 110px; }
+
+.readonly-message {
+  font-size: 13px;
+  color: var(--text-meta);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
 
 .modal-row-2 {
   display: grid;

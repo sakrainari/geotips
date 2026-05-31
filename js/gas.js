@@ -1,14 +1,15 @@
 // ===== GAS連携モジュール =====
-// トークンは js/config.js で管理（.gitignoreで除外）
-
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzgl6saHmZ4K9yBLp5CoHB1RAz8Ogzs9gVsYp04L2hODgzaVuqW7lZNf0eAbNprzj9MZQ/exec';
+// 公開用の既定URL。ローカルでは js/config.js の GAS_URL で上書きできる。
+// トークンも js/config.js で管理（.gitignoreで除外）。
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzgl6saHmZ4K9yBLp5CoHB1RAz8Ogzs9gVsYp04L2hODgzaVuqW7lZNf0eAbNprzj9MZQ/exec';
+const ACTIVE_GAS_URL = (typeof GAS_URL !== 'undefined' && GAS_URL) ? GAS_URL : DEFAULT_GAS_URL;
 
 // ===== GET系 =====
 
 // 公開データ取得（閲覧ページ用・認証不要）
 async function fetchPublicData() {
-  if (!GAS_URL) return MOCK_DATA; // GAS未設定時はモックデータを返す
-  const res  = await fetch(`${GAS_URL}?action=getPublic`);
+  if (!ACTIVE_GAS_URL) return MOCK_DATA; // GAS未設定時はモックデータを返す
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getPublic`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   return json.data;
@@ -16,8 +17,8 @@ async function fetchPublicData() {
 
 // 全データ取得（管理者用）
 async function fetchAllData(token) {
-  if (!GAS_URL) throw new Error('GAS_URLが設定されていません（js/gas.js を確認してください）');
-  const res  = await fetch(`${GAS_URL}?action=getAll&token=${encodeURIComponent(token)}`);
+  if (!ACTIVE_GAS_URL) throw new Error('GAS_URLが設定されていません（js/config.js または js/gas.js を確認してください）');
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getAll&token=${encodeURIComponent(token)}`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   return json.data;
@@ -25,8 +26,8 @@ async function fetchAllData(token) {
 
 // 監修待ちデータ取得（監修者用）
 async function fetchPendingData(token) {
-  if (!GAS_URL) throw new Error('GAS_URLが設定されていません（js/gas.js を確認してください）');
-  const res  = await fetch(`${GAS_URL}?action=getPending&token=${encodeURIComponent(token)}`);
+  if (!ACTIVE_GAS_URL) throw new Error('GAS_URLが設定されていません（js/config.js または js/gas.js を確認してください）');
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getPending&token=${encodeURIComponent(token)}`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   return json.data;
@@ -34,8 +35,8 @@ async function fetchPendingData(token) {
 
 // 監修者マスター取得
 async function fetchSupervisors(token) {
-  if (!GAS_URL) throw new Error('GAS_URLが設定されていません（js/gas.js を確認してください）');
-  const res  = await fetch(`${GAS_URL}?action=getSupervisors&token=${encodeURIComponent(token)}`);
+  if (!ACTIVE_GAS_URL) throw new Error('GAS_URLが設定されていません（js/config.js または js/gas.js を確認してください）');
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getSupervisors&token=${encodeURIComponent(token)}`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   return json.data;
@@ -45,7 +46,7 @@ async function fetchSupervisors(token) {
 
 // 新規登録（登録フォーム用）
 async function submitRegistration(formData) {
-  const res  = await fetch(`${GAS_URL}?action=register`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=register`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify(formData),
@@ -55,7 +56,7 @@ async function submitRegistration(formData) {
 
 // ステータス更新（監修者用）
 async function updateStatus(id, status, supervisorId, token) {
-  const res  = await fetch(`${GAS_URL}?action=updateStatus&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=updateStatus&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ id, status, supervisorId }),
@@ -65,7 +66,7 @@ async function updateStatus(id, status, supervisorId, token) {
 
 // データ編集（監修者・管理者用）
 async function updateData(id, fields, token) {
-  const res  = await fetch(`${GAS_URL}?action=update&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=update&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ id, ...fields }),
@@ -75,7 +76,7 @@ async function updateData(id, fields, token) {
 
 // データ削除（管理者用）
 async function deleteData(id, token) {
-  const res  = await fetch(`${GAS_URL}?action=delete&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=delete&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ id }),
@@ -86,7 +87,7 @@ async function deleteData(id, token) {
 // 監修者追加（管理者用）
 // ※ GAS側に action=addSupervisor の実装が必要
 async function addSupervisor(data, token) {
-  const res  = await fetch(`${GAS_URL}?action=addSupervisor&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=addSupervisor&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify(data),
@@ -99,7 +100,7 @@ async function addSupervisor(data, token) {
 // 監修者更新（管理者用）
 // ※ GAS側に action=updateSupervisor の実装が必要
 async function updateSupervisorData(id, data, token) {
-  const res  = await fetch(`${GAS_URL}?action=updateSupervisor&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=updateSupervisor&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ 監修者ID: id, ...data }),
@@ -126,13 +127,13 @@ const DEFAULT_GENRES = [
 
 // ジャンル一覧取得（認証不要・「その他」を末尾に移動）
 async function fetchGenres() {
-  if (!GAS_URL) {
+  if (!ACTIVE_GAS_URL) {
     // GAS未設定時はデフォルトを返す
     const others = DEFAULT_GENRES.filter(g => g.ジャンル名 === 'その他');
     const rest   = DEFAULT_GENRES.filter(g => g.ジャンル名 !== 'その他');
     return [...rest, ...others];
   }
-  const res  = await fetch(`${GAS_URL}?action=getGenres`);
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getGenres`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   // 「その他」を末尾に移動（GAS側でもやっているが念のため）
@@ -144,7 +145,7 @@ async function fetchGenres() {
 
 // ジャンル追加（管理者用）
 async function addGenreData(data, token) {
-  const res  = await fetch(`${GAS_URL}?action=addGenre&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=addGenre&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify(data),
@@ -156,7 +157,7 @@ async function addGenreData(data, token) {
 
 // ジャンル更新（管理者用）
 async function updateGenreData(id, data, token) {
-  const res  = await fetch(`${GAS_URL}?action=updateGenre&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=updateGenre&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ ジャンルID: id, ...data }),
@@ -168,7 +169,7 @@ async function updateGenreData(id, data, token) {
 
 // ジャンル削除（管理者用）
 async function deleteGenreData(id, token) {
-  const res  = await fetch(`${GAS_URL}?action=deleteGenre&token=${encodeURIComponent(token)}`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=deleteGenre&token=${encodeURIComponent(token)}`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ id }),
@@ -182,8 +183,8 @@ async function deleteGenreData(id, token) {
 
 // 投稿者名で自分の投稿を取得（認証不要）
 async function fetchMyData(name) {
-  if (!GAS_URL) throw new Error('GAS_URLが設定されていません');
-  const res  = await fetch(`${GAS_URL}?action=getMyData&name=${encodeURIComponent(name)}`);
+  if (!ACTIVE_GAS_URL) throw new Error('GAS_URLが設定されていません');
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=getMyData&name=${encodeURIComponent(name)}`);
   const json = await res.json();
   if (json.status !== 'success') throw new Error(json.message);
   return json.data;
@@ -191,7 +192,7 @@ async function fetchMyData(name) {
 
 // 投稿を修正して再送信（認証不要・投稿者名で照合）
 async function updateMyData(name, id, fields) {
-  const res  = await fetch(`${GAS_URL}?action=updateMyData`, {
+  const res  = await fetch(`${ACTIVE_GAS_URL}?action=updateMyData`, {
     method:  'POST',
     headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify({ name, id, ...fields }),

@@ -412,6 +412,8 @@ function openEditModal(context, id) {
   document.getElementById('edit-image-credit').value = item.画像クレジット || '';
   document.getElementById('edit-trivia').value    = item.Trivia用テキスト || '';
   document.getElementById('edit-memo').textContent = item.監修者へのメモ || '（なし）';
+  document.getElementById('edit-return-reason').value = item.備考 || '';
+  document.getElementById('edit-supervisor-select').value = item.監修者ID || '';
 
   updateEditImagePreview(item.画像URL || '');
   updateTriviaCounter();
@@ -465,6 +467,10 @@ function collectEditFields() {
   };
 }
 
+function getReturnReason() {
+  return document.getElementById('edit-return-reason').value.trim();
+}
+
 // 承認して公開
 document.getElementById('edit-approve').addEventListener('click', async () => {
   if (!state.currentEdit) return;
@@ -473,7 +479,7 @@ document.getElementById('edit-approve').addEventListener('click', async () => {
 
   const { item } = state.currentEdit;
   try {
-    await updateData(item.id, collectEditFields(), state.token);
+    await updateData(item.id, { ...collectEditFields(), 備考: '' }, state.token);
     await updateStatus(item.id, '公開', supId, state.token);
     showToast('承認して公開しました');
     closeEditModal();
@@ -485,9 +491,15 @@ document.getElementById('edit-approve').addEventListener('click', async () => {
 // 差し戻し
 document.getElementById('edit-reject').addEventListener('click', async () => {
   if (!state.currentEdit) return;
+  const reason = getReturnReason();
+  if (!reason) {
+    alert('差し戻し理由を入力してください');
+    document.getElementById('edit-return-reason').focus();
+    return;
+  }
   const { item } = state.currentEdit;
   try {
-    await updateData(item.id, collectEditFields(), state.token);
+    await updateData(item.id, { ...collectEditFields(), 備考: reason }, state.token);
     await updateStatus(item.id, '差し戻し', '', state.token);
     showToast('差し戻しました');
     closeEditModal();

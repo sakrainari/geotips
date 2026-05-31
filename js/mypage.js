@@ -73,9 +73,13 @@ function renderTable() {
   }
 
   const rows = myPosts.map(item => {
-    const editBtn = item.公開ステータス === '差し戻し'
+    const canEdit = item.公開ステータス !== '公開';
+    const editBtn = canEdit
       ? `<button class="btn btn-sm btn-edit" onclick="openEditModal('${escHtml(item.id)}')">編集</button>`
       : '';
+    const returnReason = item.公開ステータス === '差し戻し' && item.備考
+      ? escHtml(item.備考)
+      : '—';
 
     return `
       <tr>
@@ -86,6 +90,7 @@ function renderTable() {
         <td>${escHtml(item.スコープ || '')}</td>
         <td class="td-meta-short">${escHtml((item.メタ知識 || '').slice(0, 40))}${(item.メタ知識 || '').length > 40 ? '…' : ''}</td>
         <td>${statusBadgeHtml(item.公開ステータス)}</td>
+        <td class="td-reason-short">${returnReason}</td>
         <td>${editBtn}</td>
       </tr>
     `;
@@ -96,7 +101,7 @@ function renderTable() {
       <table class="mypage-table">
         <thead><tr>
           <th>登録日</th><th>国</th><th>地域</th><th>ジャンル</th>
-          <th>スコープ</th><th>メタ知識</th><th>ステータス</th><th>操作</th>
+          <th>スコープ</th><th>メタ知識</th><th>ステータス</th><th>差し戻し理由</th><th>操作</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -125,10 +130,13 @@ function openEditModal(id) {
   document.getElementById('edit-image-url').value      = item.画像URL || '';
   document.getElementById('edit-image-credit').value   = item.画像クレジット || '';
   document.getElementById('edit-memo').value           = item.監修者へのメモ || '';
+  document.getElementById('edit-return-reason-display').textContent = item.備考 || '（なし）';
+  document.getElementById('edit-return-reason-wrap').classList.toggle('hidden', !item.備考);
 
   // ジャンル選択を現在値にセット
   populateEditGenreSelect(item.ジャンル);
   updateEditImagePreview(item.画像URL || '');
+  updateResubmitButtonLabel(item.公開ステータス);
 
   document.getElementById('edit-modal').classList.remove('hidden');
 }
@@ -159,11 +167,20 @@ function updateEditImagePreview(url) {
   img.onload  = () => { err.classList.remove('visible'); };
 }
 
+function updateResubmitButtonLabel(status) {
+  const btn = document.getElementById('btn-resubmit');
+  btn.textContent = status === '差し戻し' ? '修正して再送信' : '更新して再送信';
+}
+
 // ===========================
 // 7. 修正して再送信
 // ===========================
 document.getElementById('btn-resubmit').addEventListener('click', async () => {
   if (!editItem) return;
+  const currentItem = editItem;
+  const successMessage = currentItem.公開ステータス === '差し戻し'
+    ? '修正して再送信しました'
+    : '更新して再送信しました';
 
   const fields = {
     国:             document.getElementById('edit-country').value.trim(),
@@ -184,18 +201,18 @@ document.getElementById('btn-resubmit').addEventListener('click', async () => {
   btn.disabled    = true;
 
   try {
-    await updateMyData(myName, editItem.id, fields);
-    showToast('修正して再送信しました');
-    closeEditModal();
+    await updateMyData(myName, currentItem.id, fields);
+    showToast(successMessage);
 
     // ローカルのデータも更新して再描画
-    const idx = myPosts.findIndex(p => p.id === editItem.id);
+    const idx = myPosts.findIndex(p => p.id === currentItem.id);
     if (idx !== -1) myPosts[idx] = { ...myPosts[idx], ...fields, 公開ステータス: '監修待ち' };
+    closeEditModal();
     renderTable();
   } catch (e) {
     alert('エラー: ' + e.message);
   } finally {
-    btn.textContent = '修正して再送信';
+    updateResubmitButtonLabel(currentItem.公開ステータス);
     btn.disabled    = false;
   }
 });
