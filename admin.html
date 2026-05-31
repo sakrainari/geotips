@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geotips Admin</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ===== トークンモーダル ===== -->
+  <div id="token-modal" class="token-overlay">
+    <div class="token-box">
+      <h2>🔐 Geotips Admin</h2>
+      <p>監修者トークンまたは管理者トークンを入力してください</p>
+      <input type="password" id="token-input" placeholder="トークンを入力" autocomplete="off">
+      <span class="token-error" id="token-error"></span>
+      <button id="token-submit" class="btn btn-primary">確認する</button>
+    </div>
+  </div>
+
+  <!-- ===== ヘッダー ===== -->
+  <header class="site-header">
+    <div>
+      <div class="site-title">Geotips Admin</div>
+      <div class="site-subtitle">監修・管理ページ</div>
+    </div>
+    <div class="header-right">
+      <span id="mode-badge" class="mode-badge hidden"></span>
+      <button id="theme-toggle" class="theme-toggle-btn" title="テーマ切替">🌙</button>
+    </div>
+  </header>
+
+  <!-- ===== タブナビ（ログイン後に表示） ===== -->
+  <nav id="tab-nav" class="tab-nav hidden">
+    <button class="tab-btn active" data-tab="pending">監修待ち一覧</button>
+    <button class="tab-btn tab-admin-only hidden" data-tab="all">全データ管理</button>
+    <button class="tab-btn tab-admin-only hidden" data-tab="supervisors">監修者マスター</button>
+    <button class="tab-btn tab-admin-only hidden" data-tab="registrants">登録者管理</button>
+    <button class="tab-btn tab-admin-only hidden" data-tab="genres">ジャンル管理</button>
+  </nav>
+
+  <!-- ===== タブ1：監修待ち一覧 ===== -->
+  <div id="tab-pending" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>監修待ち一覧</h2>
+      <button class="btn btn-sm btn-muted" onclick="loadPending()">再読み込み</button>
+    </div>
+    <div id="pending-table-wrap"></div>
+  </div>
+
+  <!-- ===== タブ2：全データ管理（管理者） ===== -->
+  <div id="tab-all" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>全データ管理</h2>
+      <div class="filter-bar">
+        <select id="all-filter">
+          <option value="">すべてのステータス</option>
+          <option value="公開">公開</option>
+          <option value="監修待ち">監修待ち</option>
+          <option value="差し戻し">差し戻し</option>
+          <option value="再確認待ち">再確認待ち</option>
+          <option value="非公開">非公開</option>
+        </select>
+        <button class="btn btn-sm btn-muted" onclick="loadAllData()">再読み込み</button>
+      </div>
+    </div>
+    <div id="all-table-wrap"></div>
+  </div>
+
+  <!-- ===== タブ3：監修者マスター管理（管理者） ===== -->
+  <div id="tab-supervisors" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>監修者マスター管理</h2>
+      <button class="btn btn-sm btn-primary" onclick="openSupervisorModal('')">＋ 新規追加</button>
+    </div>
+    <div id="supervisor-table-wrap"></div>
+  </div>
+
+  <!-- ===== タブ4：登録者管理（管理者） ===== -->
+  <div id="tab-registrants" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>登録者管理</h2>
+    </div>
+    <div id="registrant-table-wrap"></div>
+  </div>
+
+  <!-- ===== タブ5：ジャンル管理（管理者） ===== -->
+  <div id="tab-genres" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>ジャンル管理</h2>
+      <button class="btn btn-sm btn-primary" onclick="openGenreModal('')">＋ 新規追加</button>
+    </div>
+    <div id="genre-table-wrap"></div>
+  </div>
+
+  <!-- ===== 編集モーダル ===== -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="edit-modal-box">
+
+      <div class="modal-header">
+        <div>
+          <h3>監修・編集 <span id="edit-id" class="text-muted"></span></h3>
+          <div class="meta-row">投稿者：<span id="edit-poster" class="text-strong"></span></div>
+          <div class="meta-row" style="margin-top:4px;">ステータス：<span id="edit-current-status"></span></div>
+        </div>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- 国・地域 -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>国</label>
+            <input type="text" id="edit-country">
+          </div>
+          <div class="modal-field">
+            <label>地域</label>
+            <input type="text" id="edit-region">
+          </div>
+        </div>
+
+        <!-- スコープ・ジャンル -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>スコープ</label>
+            <select id="edit-scope">
+              <option value="Country">Country</option>
+              <option value="Region">Region</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>ジャンル</label>
+            <select id="edit-genre">
+              <!-- admin.jsで動的に生成 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- メタ知識 -->
+        <div class="modal-field">
+          <label>メタ知識</label>
+          <textarea id="edit-meta" class="tall"></textarea>
+        </div>
+
+        <!-- 補足 -->
+        <div class="modal-field">
+          <label>補足</label>
+          <textarea id="edit-supplement"></textarea>
+        </div>
+
+        <!-- 参考リンク -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>参考SVリンク</label>
+            <input type="url" id="edit-sv-url">
+          </div>
+          <div class="modal-field">
+            <label>参考サイト</label>
+            <input type="url" id="edit-ref-url">
+          </div>
+        </div>
+
+        <!-- 画像URL + プレビュー -->
+        <div class="modal-field">
+          <label>画像URL</label>
+          <input type="url" id="edit-image-url">
+          <img  id="edit-image-preview" class="modal-image-preview" src="" alt="プレビュー">
+          <div  id="edit-image-error"   class="modal-image-error">画像を読み込めませんでした</div>
+        </div>
+
+        <!-- 画像クレジット -->
+        <div class="modal-field">
+          <label>画像クレジット</label>
+          <input type="text" id="edit-image-credit">
+        </div>
+
+        <!-- Trivia用テキスト -->
+        <div class="modal-field">
+          <label>Trivia用テキスト</label>
+          <textarea id="edit-trivia" class="tall"></textarea>
+          <div id="trivia-counter" class="char-counter">0 / 300文字</div>
+        </div>
+
+        <!-- 投稿者からのメモ（読み取り専用） -->
+        <div class="modal-field">
+          <label>投稿者からのメモ（読み取り専用）</label>
+          <div id="edit-memo" class="memo-text"></div>
+        </div>
+
+        <!-- 担当監修者（承認時に選択） -->
+        <div class="modal-field">
+          <label>担当監修者（承認時に選択してください）</label>
+          <select id="edit-supervisor-select">
+            <option value="">担当監修者を選択</option>
+          </select>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer">
+        <button id="edit-approve" class="btn btn-approve">✓ 承認して公開</button>
+        <button id="edit-reject"  class="btn btn-reject">✕ 差し戻し</button>
+        <button id="edit-save"    class="btn btn-save">保存のみ</button>
+        <button id="edit-cancel"  class="btn btn-muted">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== 監修者追加・編集モーダル ===== -->
+  <div id="supervisor-modal" class="modal-overlay hidden">
+    <div class="sup-modal-box edit-modal-box">
+
+      <div class="modal-header">
+        <h3 id="sup-modal-title">監修者を追加</h3>
+        <button class="modal-close" onclick="closeSupervisorModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>監修者ID（新規時のみ入力可）</label>
+          <input type="text" id="sup-id" placeholder="例：SUP001">
+        </div>
+        <div class="modal-field">
+          <label>名前</label>
+          <input type="text" id="sup-name">
+        </div>
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>GeoGuessrレート</label>
+            <input type="text" id="sup-rate" placeholder="例：42,000">
+          </div>
+          <div class="modal-field">
+            <label>得意分野</label>
+            <input type="text" id="sup-specialty" placeholder="例：日本・東欧特化">
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>一言プロフィール</label>
+          <textarea id="sup-profile"></textarea>
+        </div>
+        <div class="modal-field">
+          <label>GeoGuessrプロフィールURL</label>
+          <input type="url" id="sup-url">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="sup-save"   class="btn btn-primary">保存</button>
+        <button id="sup-cancel" class="btn btn-muted">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== ジャンル追加・編集モーダル ===== -->
+  <div id="genre-modal" class="modal-overlay hidden">
+    <div class="sup-modal-box edit-modal-box">
+
+      <div class="modal-header">
+        <h3 id="genre-modal-title">ジャンルを追加</h3>
+        <button class="modal-close" onclick="closeGenreModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>ジャンルID（新規時のみ入力可）</label>
+          <input type="text" id="genre-id" placeholder="例：genre_10">
+        </div>
+        <div class="modal-field">
+          <label>ジャンル名</label>
+          <input type="text" id="genre-name" placeholder="例：空港">
+        </div>
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>背景色</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="genre-bg-picker" value="#F1EFE8">
+              <input type="text"  id="genre-bg-text"   value="#F1EFE8" placeholder="#F1EFE8" maxlength="7">
+            </div>
+          </div>
+          <div class="modal-field">
+            <label>文字色</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="genre-text-picker" value="#444441">
+              <input type="text"  id="genre-text-text"   value="#444441" placeholder="#444441" maxlength="7">
+            </div>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>表示順（小さいほど上に表示・「その他」は常に最後）</label>
+          <input type="number" id="genre-order" value="99" min="1" max="999">
+        </div>
+        <div class="modal-field">
+          <label>バッジプレビュー</label>
+          <span id="genre-badge-preview" class="badge" style="background:#F1EFE8;color:#444441;">ジャンル名</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="genre-save"   class="btn btn-primary">保存</button>
+        <button id="genre-cancel" class="btn btn-muted">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== トースト通知 ===== -->
+  <div id="toast" class="toast"></div>
+
+  <!-- config.jsがある場合はトークンを自動入力（.gitignoreで除外） -->
+  <script src="js/config.js" onerror=""></script>
+  <script src="js/common.js"></script>
+  <script src="js/gas.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

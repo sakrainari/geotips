@@ -1,0 +1,201 @@
+/* ===== ページ全体 ===== */
+.register-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 6px;
+}
+
+.page-description {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-bottom: 32px;
+}
+
+/* ===== フォーム全体 ===== */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== 各フィールド ===== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.required-mark {
+  color: #F87171;
+  font-size: 12px;
+}
+
+.field-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ===== 入力要素 共通 ===== */
+.field input[type="text"],
+.field input[type="url"],
+.field textarea,
+.field select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.field input[type="text"]:focus,
+.field input[type="url"]:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: #22C55E;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field textarea.meta-area {
+  min-height: 120px;
+}
+
+.field textarea.supplement-area,
+.field textarea.memo-area {
+  min-height: 80px;
+}
+
+/* ===== ラジオボタン（スコープ） ===== */
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #22C55E;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ===== 画像プレビュー ===== */
+.image-preview-wrap {
+  margin-top: 6px;
+}
+
+#image-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: none;
+}
+
+#image-preview.visible {
+  display: block;
+}
+
+.image-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+  margin-top: 4px;
+}
+
+.image-error.visible {
+  display: block;
+}
+
+/* ===== エラーメッセージ ===== */
+.field-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+  margin-top: 2px;
+}
+
+.field-error.visible {
+  display: block;
+}
+
+.field input.error,
+.field textarea.error,
+.field select.error {
+  border-color: #F87171;
+}
+
+/* ===== 送信ボタン ===== */
+.submit-area {
+  padding-top: 8px;
+}
+
+.submit-btn {
+  background: #22C55E;
+  color: #0A0F1E;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 40px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submit-btn:hover {
+  opacity: 0.85;
+}
+
+/* ===== 送信後メッセージ ===== */
+.submit-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #14532D;
+  color: #86EFAC;
+  border-radius: 6px;
+  font-size: 14px;
+  display: none;
+}
+
+.submit-message.visible {
+  display: block;
+}

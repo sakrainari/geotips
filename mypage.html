@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geotips マイページ</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/mypage.css">
+</head>
+<body>
+
+  <!-- ===== ヘッダー ===== -->
+  <header class="site-header">
+    <div>
+      <div class="site-title">Geotips マイページ</div>
+      <div class="site-subtitle">自分の投稿を確認・修正する</div>
+    </div>
+    <div class="header-nav">
+      <a href="index.html"    class="nav-link">← 閲覧ページへ</a>
+      <a href="register.html" class="nav-link">新規登録へ →</a>
+      <button id="theme-toggle" class="theme-toggle-btn" title="テーマ切替">🌙</button>
+    </div>
+  </header>
+
+  <!-- ===== 名前入力セクション ===== -->
+  <div id="name-section" class="name-input-section">
+    <h2>👤 投稿者名を入力</h2>
+    <p>登録時に使用した投稿者名を入力すると、自分の投稿一覧を確認できます。</p>
+    <input type="text" id="name-input" placeholder="例：稲荷" autocomplete="nickname">
+    <span class="name-error" id="name-error"></span>
+    <button id="name-submit" class="btn btn-primary">確認する</button>
+  </div>
+
+  <!-- ===== マイページ本体（ログイン後に表示） ===== -->
+  <div id="mypage-section" class="mypage-body hidden">
+    <div class="mypage-header-row">
+      <div>
+        <h2><span id="mypage-username"></span> さんの投稿</h2>
+        <span class="mypage-count" id="mypage-count"></span>
+      </div>
+      <button class="btn btn-sm btn-muted" onclick="location.reload()">← 名前を変更</button>
+    </div>
+    <div id="mypage-table-wrap">
+      <p class="loading-text">読み込み中...</p>
+    </div>
+  </div>
+
+  <!-- ===== 編集モーダル ===== -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="edit-modal-box">
+
+      <div class="modal-header">
+        <div>
+          <h3>投稿を修正 <span id="edit-id" class="text-muted" style="color:var(--text-sub);font-size:13px;"></span></h3>
+          <div class="meta-row">ステータス：<span id="edit-status"></span></div>
+        </div>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- 国・地域 -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>国</label>
+            <input type="text" id="edit-country">
+          </div>
+          <div class="modal-field">
+            <label>地域</label>
+            <input type="text" id="edit-region">
+          </div>
+        </div>
+
+        <!-- スコープ・ジャンル -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>スコープ</label>
+            <select id="edit-scope">
+              <option value="Country">Country（国全体に当てはまる）</option>
+              <option value="Region">Region（特定の地域のみ）</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>ジャンル</label>
+            <select id="edit-genre">
+              <!-- mypage.jsで動的生成 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- メタ知識 -->
+        <div class="modal-field">
+          <label>メタ知識</label>
+          <textarea id="edit-meta" class="tall"></textarea>
+        </div>
+
+        <!-- 補足 -->
+        <div class="modal-field">
+          <label>補足</label>
+          <textarea id="edit-supplement"></textarea>
+        </div>
+
+        <!-- 参考リンク -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>参考SVリンク</label>
+            <input type="url" id="edit-sv-url">
+          </div>
+          <div class="modal-field">
+            <label>参考サイト</label>
+            <input type="url" id="edit-ref-url">
+          </div>
+        </div>
+
+        <!-- 画像URL + プレビュー -->
+        <div class="modal-field">
+          <label>画像URL</label>
+          <input type="url" id="edit-image-url">
+          <img  id="edit-image-preview" class="modal-image-preview" src="" alt="プレビュー">
+          <div  id="edit-image-error"   class="modal-image-error">画像を読み込めませんでした</div>
+        </div>
+
+        <!-- 画像クレジット -->
+        <div class="modal-field">
+          <label>画像クレジット</label>
+          <input type="text" id="edit-image-credit">
+        </div>
+
+        <!-- 監修者へのメモ -->
+        <div class="modal-field">
+          <label>監修者へのメモ <span style="font-size:11px;color:var(--text-muted);font-weight:400;">（差し戻し理由への返答や補足を記入してください）</span></label>
+          <textarea id="edit-memo"></textarea>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer">
+        <button id="btn-resubmit" class="btn btn-resubmit">修正して再送信</button>
+        <button id="btn-cancel"   class="btn btn-muted">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== トースト通知 ===== -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/config.js" onerror=""></script>
+  <script src="data/mock.js"></script>
+  <script src="js/gas.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/mypage.js"></script>
+</body>
+</html>

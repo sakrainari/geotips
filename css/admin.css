@@ -1,0 +1,465 @@
+/* ===== トークンモーダル ===== */
+.token-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.token-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.token-box h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.token-box p {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.token-box input[type="password"] {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.token-box input[type="password"]:focus {
+  border-color: #22C55E;
+}
+
+.token-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+}
+
+.token-error.visible {
+  display: block;
+}
+
+/* ===== ヘッダー右側 ===== */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mode-badge.admin {
+  background: #1E3A5F;
+  color: #60A5FA;
+}
+
+.mode-badge.supervisor {
+  background: #14532D;
+  color: #86EFAC;
+}
+
+/* ===== タブナビ ===== */
+.tab-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  padding: 0 24px;
+  gap: 4px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-sub);
+  font-size: 14px;
+  padding: 14px 16px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  color: #22C55E;
+  border-bottom-color: #22C55E;
+  font-weight: 600;
+}
+
+/* ===== タブパネル ===== */
+.tab-panel {
+  padding: 20px 24px 60px;
+}
+
+.tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tab-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+/* ===== フィルターバー ===== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-bar select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  outline: none;
+}
+
+/* ===== 管理テーブル共通 ===== */
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: auto;
+}
+
+.admin-table th {
+  background: var(--surface);
+  color: var(--text-sub);
+  font-weight: 600;
+  padding: 9px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-meta);
+  vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+  background: var(--hover-bg);
+}
+
+.td-meta-short {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.td-actions {
+  white-space: nowrap;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* ===== ボタン ===== */
+.btn {
+  border: none;
+  border-radius: 5px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+.btn-primary  { background: #22C55E; color: #0A0F1E; }
+.btn-approve  { background: #16A34A; color: #fff; }
+.btn-reject   { background: #DC2626; color: #fff; }
+.btn-save     { background: #2563EB; color: #fff; }
+.btn-edit     { background: #1D4ED8; color: #fff; }
+.btn-danger   { background: #DC2626; color: #fff; }
+.btn-muted    { background: var(--surface-2); color: var(--text-sub); border: 1px solid var(--border-2); }
+
+/* ===== ローディング・空・エラー表示 ===== */
+.loading-text { color: var(--text-sub);  padding: 24px 0; }
+.empty-text   { color: var(--text-muted); padding: 24px 0; }
+.error-text   { color: #F87171; padding: 24px 0; }
+
+/* ===== 編集モーダル ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 40px 16px;
+}
+
+.edit-modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+
+.modal-header .meta-row {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: 65vh;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===== モーダル内フィールド ===== */
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.modal-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.modal-field input,
+.modal-field textarea,
+.modal-field select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+}
+
+.modal-field input:focus,
+.modal-field textarea:focus,
+.modal-field select:focus {
+  border-color: #22C55E;
+}
+
+.modal-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.modal-field textarea.tall { min-height: 110px; }
+
+.modal-field .readonly-value {
+  font-size: 14px;
+  color: var(--text);
+  padding: 4px 0;
+}
+
+.modal-field .memo-text {
+  font-size: 13px;
+  color: var(--text-meta);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.modal-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* 画像プレビュー（モーダル内） */
+.modal-image-preview {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: none;
+  margin-top: 6px;
+}
+
+.modal-image-preview.visible { display: block; }
+
+.modal-image-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+  margin-top: 4px;
+}
+
+.modal-image-error.visible { display: block; }
+
+/* Triviaカウンター */
+.char-counter {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+.char-counter.over {
+  color: #F87171;
+  font-weight: 600;
+}
+
+/* ===== 監修者モーダル ===== */
+.sup-modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* ===== トースト通知 ===== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #22C55E;
+  color: #0A0F1E;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  z-index: 3000;
+  white-space: nowrap;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== カラーピッカー（ジャンル管理） ===== */
+.color-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-picker-wrap input[type="color"] {
+  width: 40px;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  background: var(--surface-2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.color-picker-wrap input[type="text"] {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: monospace;
+  outline: none;
+  width: 100%;
+}
+
+.color-picker-wrap input[type="text"]:focus {
+  border-color: #22C55E;
+}
+
+/* ===== テキストユーティリティ ===== */
+.text-muted  { color: var(--text-sub); }
+.text-strong { color: var(--text-strong); font-weight: 600; }

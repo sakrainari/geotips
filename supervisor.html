@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geotips 監修ページ</title>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/supervisor.css">
+</head>
+<body>
+
+  <!-- ===== トークンモーダル（2ステップ） ===== -->
+  <div id="token-modal" class="token-overlay">
+    <div class="token-box">
+      <h2>🔐 Geotips 監修ページ</h2>
+
+      <!-- ステップ1：トークン入力 -->
+      <div id="step1" class="token-step">
+        <p>監修者トークンを入力してください</p>
+        <input type="password" id="token-input" placeholder="トークンを入力" autocomplete="off">
+        <span class="token-error" id="token-error"></span>
+        <button id="token-submit" class="btn btn-primary">確認する</button>
+      </div>
+
+      <!-- ステップ2：監修者選択 -->
+      <div id="step2" class="token-step hidden">
+        <p>あなたの監修者アカウントを選択してください</p>
+        <select id="sup-select"></select>
+        <span class="token-error" id="sup-select-error"></span>
+        <button id="sup-select-submit" class="btn btn-primary">開始する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ヘッダー ===== -->
+  <header class="site-header">
+    <div>
+      <div class="site-title">Geotips 監修ページ</div>
+      <div class="site-subtitle">Supervisor Portal</div>
+    </div>
+    <div class="header-right">
+      <span id="header-sup-info" class="mode-badge supervisor hidden">
+        👤 <span id="logged-in-name"></span>
+      </span>
+      <button id="theme-toggle" class="theme-toggle-btn" title="テーマ切替">🌙</button>
+    </div>
+  </header>
+
+  <!-- ===== タブナビ ===== -->
+  <nav id="tab-nav" class="tab-nav hidden">
+    <button class="tab-btn active" data-tab="pending">監修待ち</button>
+    <button class="tab-btn" data-tab="profile">監修者情報</button>
+  </nav>
+
+  <!-- ===== タブ1：監修待ち一覧 ===== -->
+  <div id="tab-pending" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>監修待ち一覧</h2>
+      <button class="btn btn-sm btn-muted" onclick="loadPending()">再読み込み</button>
+    </div>
+    <div id="pending-table-wrap"></div>
+  </div>
+
+  <!-- ===== タブ2：監修者情報 ===== -->
+  <div id="tab-profile" class="tab-panel hidden">
+    <div class="tab-header">
+      <h2>監修者情報</h2>
+    </div>
+    <div id="profile-wrap"></div>
+  </div>
+
+  <!-- ===== 編集モーダル ===== -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="edit-modal-box">
+
+      <div class="modal-header">
+        <div>
+          <h3>監修・編集 <span id="edit-id" class="text-muted"></span></h3>
+          <div class="meta-row">投稿者：<span id="edit-poster" class="text-strong"></span></div>
+          <div class="meta-row" style="margin-top:4px;">ステータス：<span id="edit-current-status"></span></div>
+        </div>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- 国・地域 -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>国</label>
+            <input type="text" id="edit-country">
+          </div>
+          <div class="modal-field">
+            <label>地域</label>
+            <input type="text" id="edit-region">
+          </div>
+        </div>
+
+        <!-- スコープ・ジャンル -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>スコープ</label>
+            <select id="edit-scope">
+              <option value="Country">Country</option>
+              <option value="Region">Region</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>ジャンル</label>
+            <select id="edit-genre">
+              <!-- supervisor.jsで動的に生成 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- メタ知識 -->
+        <div class="modal-field">
+          <label>メタ知識</label>
+          <textarea id="edit-meta" class="tall"></textarea>
+        </div>
+
+        <!-- 補足 -->
+        <div class="modal-field">
+          <label>補足</label>
+          <textarea id="edit-supplement"></textarea>
+        </div>
+
+        <!-- 参考リンク -->
+        <div class="modal-row-2">
+          <div class="modal-field">
+            <label>参考SVリンク</label>
+            <input type="url" id="edit-sv-url">
+          </div>
+          <div class="modal-field">
+            <label>参考サイト</label>
+            <input type="url" id="edit-ref-url">
+          </div>
+        </div>
+
+        <!-- 画像URL + プレビュー -->
+        <div class="modal-field">
+          <label>画像URL</label>
+          <input type="url" id="edit-image-url">
+          <img  id="edit-image-preview" class="modal-image-preview" src="" alt="プレビュー">
+          <div  id="edit-image-error"   class="modal-image-error">画像を読み込めませんでした</div>
+        </div>
+
+        <!-- 画像クレジット -->
+        <div class="modal-field">
+          <label>画像クレジット</label>
+          <input type="text" id="edit-image-credit">
+        </div>
+
+        <!-- Trivia用テキスト -->
+        <div class="modal-field">
+          <label>Trivia用テキスト</label>
+          <textarea id="edit-trivia" class="tall"></textarea>
+          <div id="trivia-counter" class="char-counter">0 / 300文字</div>
+        </div>
+
+        <!-- 投稿者からのメモ（読み取り専用） -->
+        <div class="modal-field">
+          <label>投稿者からのメモ（読み取り専用）</label>
+          <div id="edit-memo" class="memo-text"></div>
+        </div>
+
+        <!-- 担当監修者（自動入力） -->
+        <div class="modal-field">
+          <label>担当監修者（自動入力）</label>
+          <div id="edit-supervisor-display" class="supervisor-readonly"></div>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer">
+        <button id="edit-approve" class="btn btn-approve">✓ 承認して公開</button>
+        <button id="edit-reject"  class="btn btn-reject">✕ 差し戻し</button>
+        <button id="edit-revert"  class="btn btn-muted">監修前に戻す</button>
+        <button id="edit-save"    class="btn btn-save">保存のみ</button>
+        <button id="edit-cancel"  class="btn btn-muted">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== トースト通知 ===== -->
+  <div id="toast" class="toast"></div>
+
+  <!-- config.jsがある場合はトークンを自動入力（.gitignoreで除外） -->
+  <script src="js/config.js" onerror=""></script>
+  <script src="js/common.js"></script>
+  <script src="js/gas.js"></script>
+  <script src="js/supervisor.js"></script>
+</body>
+</html>

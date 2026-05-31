@@ -1,0 +1,310 @@
+/* ===== 名前入力セクション ===== */
+.name-input-section {
+  max-width: 480px;
+  margin: 60px auto;
+  padding: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.name-input-section h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.name-input-section p {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.name-input-section input[type="text"] {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+.name-input-section input[type="text"]:focus {
+  border-color: #22C55E;
+}
+
+.name-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+}
+
+.name-error.visible {
+  display: block;
+}
+
+/* ===== マイページ本体 ===== */
+.mypage-body {
+  padding: 24px 24px 60px;
+}
+
+.mypage-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mypage-header-row h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.mypage-count {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+/* ===== 投稿一覧テーブル ===== */
+.mypage-table-wrap {
+  overflow-x: auto;
+}
+
+.mypage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: auto;
+}
+
+.mypage-table th {
+  background: var(--surface);
+  color: var(--text-sub);
+  font-weight: 600;
+  padding: 9px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mypage-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-meta);
+  vertical-align: middle;
+}
+
+.mypage-table tr:hover td {
+  background: var(--hover-bg);
+}
+
+.td-meta-short {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== ステータスバッジ ===== */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== ボタン ===== */
+.btn {
+  border: none;
+  border-radius: 5px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-primary  { background: #22C55E; color: #0A0F1E; }
+.btn-resubmit { background: #2563EB; color: #fff; }
+.btn-muted    { background: var(--surface-2); color: var(--text-sub); border: 1px solid var(--border-2); }
+.btn-edit     { background: #1D4ED8; color: #fff; }
+
+/* ===== 編集モーダル ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 40px 16px;
+}
+
+.edit-modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 660px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+
+.modal-header .meta-row {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 2px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: 65vh;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===== モーダル内フィールド ===== */
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.modal-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.modal-field input,
+.modal-field textarea,
+.modal-field select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+}
+
+.modal-field input:focus,
+.modal-field textarea:focus,
+.modal-field select:focus {
+  border-color: #22C55E;
+}
+
+.modal-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.modal-field textarea.tall { min-height: 110px; }
+
+.modal-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-image-preview {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: none;
+  margin-top: 6px;
+}
+
+.modal-image-preview.visible { display: block; }
+
+.modal-image-error {
+  font-size: 12px;
+  color: #F87171;
+  display: none;
+  margin-top: 4px;
+}
+
+.modal-image-error.visible { display: block; }
+
+/* ===== トースト ===== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #22C55E;
+  color: #0A0F1E;
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  z-index: 3000;
+  white-space: nowrap;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===== 空・エラー ===== */
+.empty-text   { color: var(--text-muted); padding: 24px 0; }
+.error-text   { color: #F87171; padding: 24px 0; }
+.loading-text { color: var(--text-sub);  padding: 24px 0; }
+
+.hidden { display: none !important; }

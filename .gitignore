@@ -1,0 +1,8 @@
+# トークンや秘密情報を含む設定ファイル
+js/config.js
+
+# GASデプロイURLをコードに書きたくない場合はconfig.jsに記述してここで除外
+# config.jsの例：
+#   const GAS_URL = 'https://script.google.com/macros/s/xxxx/exec';
+#   const ADMIN_TOKEN = 'admin_xxxx';
+#   const SUPERVISOR_TOKEN = 'sup_xxxx';

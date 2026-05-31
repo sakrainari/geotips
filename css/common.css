@@ -1,0 +1,111 @@
+/* ===== テーマ変数定義 ===== */
+html[data-theme="dark"] {
+  --bg:          #0A0F1E;
+  --surface:     #0D1425;  /* ヘッダー・カード・テーブルヘッダー等 */
+  --surface-2:   #1A2340;  /* 入力欄・テーブル行ボーダー */
+  --border:      #1E2A45;
+  --border-2:    #2D3F60;  /* 入力欄ボーダー */
+  --text:        #E2E8F0;
+  --text-strong: #F1F5F9;  /* 国名など強調テキスト */
+  --text-meta:   #CBD5E1;  /* メタ知識テキスト・テーブルtd */
+  --text-sub:    #64748B;  /* サブタイトル・件数・地域名 */
+  --text-muted:  #475569;  /* プレースホルダー・補足・監修者 */
+  --text-faint:  #334155;  /* NO IMAGEテキスト */
+  --surface-img: #111827;  /* 画像プレースホルダー背景 */
+  --hover-bg:    #0D1425;  /* テーブル行ホバー */
+  --toggle-text: #94A3B8;  /* 表示切替ボタン非アクティブ */
+}
+
+html[data-theme="light"] {
+  --bg:          #F8FAFC;
+  --surface:     #FFFFFF;
+  --surface-2:   #F1F5F9;
+  --border:      #E2E8F0;
+  --border-2:    #CBD5E1;
+  --text:        #1E293B;
+  --text-strong: #0F172A;
+  --text-meta:   #334155;
+  --text-sub:    #64748B;
+  --text-muted:  #94A3B8;
+  --text-faint:  #CBD5E1;
+  --surface-img: #F1F5F9;
+  --hover-bg:    #F8FAFC;
+  --toggle-text: #64748B;
+}
+
+/* ===== リセット ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  transition: background 0.2s, color 0.2s;
+}
+
+a {
+  color: #22C55E;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ===== ヘッダーナビ（共通） ===== */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-link {
+  font-size: 13px;
+  color: var(--text-sub);
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.nav-link:hover {
+  color: #22C55E;
+  border-color: #22C55E;
+  text-decoration: none;
+}
+
+/* ===== テーマトグルボタン ===== */
+.theme-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.theme-toggle-btn:hover {
+  border-color: #22C55E;
+  background: #22C55E18;
+}

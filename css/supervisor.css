@@ -1,0 +1,112 @@
+/* ===== admin.cssを読み込んだ上での supervisor 専用スタイル ===== */
+
+/* トークンモーダル：ステップ2（監修者選択） */
+.token-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.token-step.hidden {
+  display: none;
+}
+
+.token-box select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.token-box select:focus {
+  border-color: #22C55E;
+}
+
+/* 監修者情報タブ */
+.supervisor-profile {
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-value {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.profile-value a {
+  color: #22C55E;
+  word-break: break-all;
+}
+
+.profile-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+/* プロフィール編集ボタン群 */
+.profile-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+/* プロフィール編集入力欄 */
+.profile-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+.profile-input:focus {
+  border-color: #22C55E;
+}
+
+/* 読み取り専用ラベルの補足 */
+.profile-readonly-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* モーダル内の監修者表示（自動入力・読み取り専用） */
+.supervisor-readonly {
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+}

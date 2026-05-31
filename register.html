@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geotips - メタ知識を登録</title>
+  <!-- フラッシュ防止：CSSが当たる前にlocalStorageのテーマを適用 -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="site-header">
+    <div>
+      <div class="site-title">Geotips</div>
+      <div class="site-subtitle">GeoGuessr メタ知識データベース</div>
+    </div>
+    <div class="header-nav">
+      <a href="index.html" class="nav-link">← 閲覧ページへ</a>
+      <button id="theme-toggle" class="theme-toggle-btn" title="テーマ切替">🌙</button>
+    </div>
+  </header>
+
+  <!-- フォーム本体 -->
+  <div class="register-page">
+    <h1 class="page-title">メタ知識を登録する</h1>
+    <p class="page-description">投稿内容は監修者が確認後に公開されます。</p>
+
+    <form id="register-form" class="register-form" novalidate>
+
+      <!-- 投稿者名 -->
+      <div class="field">
+        <label class="field-label" for="poster_name">
+          投稿者名 <span class="required-mark">必須</span>
+        </label>
+        <input type="text" id="poster_name" placeholder="例：稲荷" autocomplete="nickname">
+        <span class="field-error" id="err-poster_name">投稿者名を入力してください</span>
+      </div>
+
+      <!-- 国 -->
+      <div class="field">
+        <label class="field-label" for="country">
+          国 <span class="required-mark">必須</span>
+        </label>
+        <input type="text" id="country" placeholder="例：トルコ">
+        <span class="field-error" id="err-country">国名を入力してください</span>
+      </div>
+
+      <!-- 地域 -->
+      <div class="field">
+        <label class="field-label" for="region">
+          地域 <span class="field-note">（省略可）</span>
+        </label>
+        <input type="text" id="region" placeholder="例：イスタンブール">
+      </div>
+
+      <!-- スコープ -->
+      <div class="field">
+        <span class="field-label">
+          スコープ <span class="required-mark">必須</span>
+        </span>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="scope" value="Country">
+            Country（国全体に当てはまる）
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="scope" value="Region">
+            Region（特定の地域のみ）
+          </label>
+        </div>
+        <span class="field-error" id="err-scope">スコープを選択してください</span>
+      </div>
+
+      <!-- ジャンル -->
+      <div class="field">
+        <label class="field-label" for="genre">
+          ジャンル <span class="required-mark">必須</span>
+          <span class="field-note">ジャンルが無い場合は「ジャンル未登録」を選択し、監修者へのメモにて追加申請してください</span>
+        </label>
+        <select id="genre">
+          <option value="">選択してください</option>
+          <!-- register.jsで動的に生成 -->
+        </select>
+        <span class="field-error" id="err-genre">ジャンルを選択してください</span>
+      </div>
+
+      <!-- メタ知識 -->
+      <div class="field">
+        <label class="field-label" for="meta">
+          メタ知識 <span class="required-mark">必須</span>
+        </label>
+        <textarea id="meta" class="meta-area" placeholder="例：STOP標識は「DUR」。イスタンブールのマンホールには「ISKi」と書かれていることがある。"></textarea>
+        <span class="field-error" id="err-meta">メタ知識を入力してください</span>
+      </div>
+
+      <!-- 補足 -->
+      <div class="field">
+        <label class="field-label" for="supplement">
+          補足 <span class="field-note">（省略可）</span>
+        </label>
+        <textarea id="supplement" class="supplement-area" placeholder="例外・補足情報があれば記入してください"></textarea>
+      </div>
+
+      <!-- 参考SVリンク -->
+      <div class="field">
+        <label class="field-label" for="sv_url">
+          参考SVリンク <span class="field-note">（省略可）</span>
+        </label>
+        <input type="url" id="sv_url" placeholder="https://maps.google.com/maps?...">
+        <span class="field-error" id="err-sv_url">URLはhttpまたはhttpsで始めてください</span>
+      </div>
+
+      <!-- 参考サイト -->
+      <div class="field">
+        <label class="field-label" for="ref_url">
+          参考サイト <span class="field-note">（省略可）</span>
+        </label>
+        <input type="url" id="ref_url" placeholder="https://...（信頼性の根拠となるURL）">
+        <span class="field-error" id="err-ref_url">URLはhttpまたはhttpsで始めてください</span>
+      </div>
+
+      <!-- 画像URL -->
+      <div class="field">
+        <label class="field-label" for="image_url">
+          画像URL <span class="field-note">（省略可・GitHub Issues等で取得したURL）</span>
+        </label>
+        <input type="url" id="image_url" placeholder="https://...">
+        <span class="field-error" id="err-image_url">URLはhttpまたはhttpsで始めてください</span>
+        <div class="image-preview-wrap">
+          <img id="image-preview" src="" alt="画像プレビュー">
+          <div class="image-error" id="image-error">画像を読み込めませんでした</div>
+        </div>
+      </div>
+
+      <!-- 画像クレジット -->
+      <div class="field">
+        <label class="field-label" for="image_credit">
+          画像クレジット <span class="field-note">（省略可）</span>
+        </label>
+        <input type="text" id="image_credit" placeholder="例：CC BY-SA 3.0 / Wikimedia Commons">
+      </div>
+
+      <!-- 監修者へのメモ -->
+      <div class="field">
+        <label class="field-label" for="memo">
+          監修者へのメモ <span class="field-note">（省略可）</span>
+          <span class="field-note" style="color:#F87171;">※監修者・管理者のみ閲覧可</span>
+        </label>
+        <textarea id="memo" class="memo-area" placeholder="監修者や管理者に伝えたいことがあれば"></textarea>
+      </div>
+
+      <!-- 送信 -->
+      <div class="submit-area">
+        <button type="submit" class="submit-btn">送信する</button>
+        <div id="submit-message" class="submit-message">
+          送信しました（現在はテスト送信です）
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <script src="js/config.js" onerror=""></script>
+  <script src="data/mock.js"></script>
+  <script src="js/gas.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>
