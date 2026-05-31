@@ -172,6 +172,7 @@ function updateStatus(id, status, supervisorId) {
   if (rowNum === -1) throw new Error('ID not found: ' + id);
 
   sheet.getRange(rowNum, COL.公開ステータス + 1).setValue(status);
+  sheet.getRange(rowNum, COL.確認済 + 1).setValue(status === '公開');
   if (supervisorId) {
     sheet.getRange(rowNum, COL.監修者ID + 1).setValue(supervisorId);
   }
@@ -264,6 +265,7 @@ function updateMyData(name, id, body) {
 
   // ステータスを「監修待ち」に戻す
   sheet.getRange(rowNum, COL.公開ステータス + 1).setValue('監修待ち');
+  sheet.getRange(rowNum, COL.確認済 + 1).setValue(false);
 
   return { id: id };
 }
