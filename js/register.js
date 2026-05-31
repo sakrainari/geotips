@@ -101,39 +101,53 @@ function validateForm() {
   return isValid;
 }
 
-// ===== 送信処理 =====
-// GASと繋ぐときはこの関数を書き換える
-async function submitToGAS(data) {
-  // TODO: const GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-  // await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
-  console.log('[Geotips] 送信データ:', data);
-}
-
 document.getElementById('register-form').addEventListener('submit', async function(e) {
   e.preventDefault();
 
   if (!validateForm()) return;
 
+  const submitBtn = this.querySelector('button[type="submit"]');
+  const msg = document.getElementById('submit-message');
   const data = {
-    poster_name:    document.getElementById('poster_name').value.trim(),
-    country:        document.getElementById('country').value.trim(),
-    region:         document.getElementById('region').value.trim(),
-    scope:          document.querySelector('input[name="scope"]:checked').value,
-    genre:          document.getElementById('genre').value,
-    meta:           document.getElementById('meta').value.trim(),
-    supplement:     document.getElementById('supplement').value.trim(),
-    sv_url:         document.getElementById('sv_url').value.trim(),
-    ref_url:        document.getElementById('ref_url').value.trim(),
-    image_url:      document.getElementById('image_url').value.trim(),
-    image_credit:   document.getElementById('image_credit').value.trim(),
-    memo:           document.getElementById('memo').value.trim(),
-    submitted_at:   new Date().toISOString(),
+    '投稿者名':        document.getElementById('poster_name').value.trim(),
+    '国':              document.getElementById('country').value.trim(),
+    '地域':            document.getElementById('region').value.trim(),
+    'スコープ':        document.querySelector('input[name="scope"]:checked').value,
+    'ジャンル':        document.getElementById('genre').value,
+    'メタ知識':        document.getElementById('meta').value.trim(),
+    '補足':            document.getElementById('supplement').value.trim(),
+    '参考SVリンク':    document.getElementById('sv_url').value.trim(),
+    '参考サイト':      document.getElementById('ref_url').value.trim(),
+    '画像URL':         document.getElementById('image_url').value.trim(),
+    '画像クレジット':  document.getElementById('image_credit').value.trim(),
+    '監修者へのメモ':  document.getElementById('memo').value.trim(),
   };
 
-  await submitToGAS(data);
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中...';
+  }
+  msg.classList.remove('visible');
+  msg.textContent = '';
 
-  // 送信完了メッセージを表示（フォームはリセットしない）
-  const msg = document.getElementById('submit-message');
-  msg.classList.add('visible');
-  msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  try {
+    const result = await submitRegistration(data);
+    if (result.status !== 'success') {
+      throw new Error(result.message || '送信に失敗しました');
+    }
+
+    msg.textContent = `送信しました。受付ID: ${result.data?.id || '---'}。監修ページで確認できる状態です。`;
+    msg.classList.add('visible');
+    msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (error) {
+    console.error('[Geotips] 登録失敗:', error);
+    msg.textContent = `送信に失敗しました: ${error.message}`;
+    msg.classList.add('visible');
+    msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '送信する';
+    }
+  }
 });
