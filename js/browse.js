@@ -1,9 +1,7 @@
 let allTips = [];
-let viewMode = 'card'; // 'card' | 'table'
+let viewMode = 'card';
 
-// --- 初期化 ---
 (async () => {
-  // ジャンルスタイルをGASから更新（失敗してもデフォルトで続行）
   try {
     const genres = await fetchGenres();
     updateGenreStylesFromData(genres);
@@ -15,10 +13,9 @@ let viewMode = 'card'; // 'card' | 'table'
   render();
 })();
 
-// --- フィルター選択肢を動的生成 ---
 function populateFilters() {
-  const countries = [...new Set(allTips.map(t => t.country))].sort();
-  const genres    = [...new Set(allTips.map(t => t.genre))].sort();
+  const countries = [...new Set(allTips.map(t => t['国']))].sort();
+  const genres    = [...new Set(allTips.map(t => t['ジャンル']))].sort();
 
   const countryEl = document.getElementById('filter-country');
   const genreEl   = document.getElementById('filter-genre');
@@ -35,7 +32,6 @@ function populateFilters() {
   });
 }
 
-// --- フィルター・ソート適用後のデータ取得 ---
 function getFiltered() {
   const keyword = document.getElementById('search').value.trim().toLowerCase();
   const country = document.getElementById('filter-country').value;
@@ -43,35 +39,33 @@ function getFiltered() {
   const scope   = document.getElementById('filter-scope').value;
   const sort    = document.getElementById('sort').value;
 
-  let data = allTips.filter(t => t.status === '公開');
+  let data = allTips.filter(t => t['公開ステータス'] === '公開');
 
   if (keyword) {
     data = data.filter(t =>
-      t.country.toLowerCase().includes(keyword) ||
-      t.region.toLowerCase().includes(keyword) ||
-      t.meta.toLowerCase().includes(keyword)
+      (t['国'] || '').toLowerCase().includes(keyword) ||
+      (t['地域'] || '').toLowerCase().includes(keyword) ||
+      (t['メタ知識'] || '').toLowerCase().includes(keyword)
     );
   }
-  if (country) data = data.filter(t => t.country === country);
-  if (genre)   data = data.filter(t => t.genre === genre);
-  if (scope)   data = data.filter(t => t.scope === scope);
+  if (country) data = data.filter(t => t['国'] === country);
+  if (genre)   data = data.filter(t => t['ジャンル'] === genre);
+  if (scope)   data = data.filter(t => t['スコープ'] === scope);
 
   data.sort((a, b) => {
-    if (sort === 'country')  return a.country.localeCompare(b.country, 'ja');
-    if (sort === 'date-new') return b.registered_at.localeCompare(a.registered_at);
-    if (sort === 'date-old') return a.registered_at.localeCompare(b.registered_at);
-    if (sort === 'genre')    return a.genre.localeCompare(b.genre, 'ja');
+    if (sort === 'country')  return (a['国'] || '').localeCompare(b['国'] || '', 'ja');
+    if (sort === 'date-new') return (b['登録日'] || '').localeCompare(a['登録日'] || '');
+    if (sort === 'date-old') return (a['登録日'] || '').localeCompare(b['登録日'] || '');
+    if (sort === 'genre')    return (a['ジャンル'] || '').localeCompare(b['ジャンル'] || '', 'ja');
     return 0;
   });
 
   return data;
 }
 
-// --- 描画 ---
 function render() {
   const data = getFiltered();
   document.getElementById('count').textContent = `${data.length}件表示中`;
-
   if (viewMode === 'card') {
     renderCards(data);
   } else {
@@ -88,39 +82,51 @@ function renderCards(data) {
     const card = document.createElement('div');
     card.className = 'card';
 
-    const supervisorInfo = tip.supervisor_rate
-      ? `${tip.supervisor_name} (${tip.supervisor_rate})`
-      : `${tip.supervisor_name}（${tip.supervisor_specialty}）`;
+    const sup = tip.supervisor || {};
+    const supervisorInfo = sup['名前']
+      ? (sup['GeoGuessrレート']
+          ? `${sup['名前']} (${sup['GeoGuessrレート']})`
+          : `${sup['名前']}（${sup['得意分野'] || ''}）`)
+      : '—';
+
+    const imageUrl    = tip['画像URL'] || '';
+    const imageCredit = tip['画像クレジット'] || '';
+    const country     = tip['国'] || '';
+    const region      = tip['地域'] || '';
+    const genre       = tip['ジャンル'] || '';
+    const scope       = tip['スコープ'] || '';
+    const meta        = tip['メタ知識'] || '';
+    const supplement  = tip['補足'] || '';
+    const svUrl       = tip['参考SVリンク'] || '';
 
     card.innerHTML = `
       <div class="card-image-wrap">
-        ${tip.image_url
-          ? `<img class="card-image" src="${tip.image_url}" alt="tip image" loading="lazy" data-credit="${escHtml(tip.image_credit)}">`
+        ${imageUrl
+          ? `<img class="card-image" src="${imageUrl}" alt="tip image" loading="lazy" data-credit="${escHtml(imageCredit)}">`
           : `<div class="card-no-image">NO IMAGE</div>`
         }
-        ${tip.image_credit ? `<span class="image-credit">${escHtml(tip.image_credit)}</span>` : ''}
+        ${imageCredit ? `<span class="image-credit">${escHtml(imageCredit)}</span>` : ''}
       </div>
       <div class="card-body">
         <div class="card-header-row">
-          <span class="country-name">${tip.flag} ${escHtml(tip.country)}</span>
-          <span class="badge scope-badge" style="${scopeBadgeStyle(tip.scope)}">${tip.scope}</span>
+          <span class="country-name">${escHtml(country)}</span>
+          <span class="badge scope-badge" style="${scopeBadgeStyle(scope)}">${escHtml(scope)}</span>
         </div>
-        <div class="region-name">${escHtml(tip.region)}</div>
-        <span class="badge genre-badge" style="${genreBadgeStyle(tip.genre)}">${escHtml(tip.genre)}</span>
-        <p class="meta-text">${escHtml(tip.meta)}</p>
-        ${tip.supplement ? `<p class="supplement-text">${escHtml(tip.supplement)}</p>` : ''}
+        <div class="region-name">${escHtml(region)}</div>
+        <span class="badge genre-badge" style="${genreBadgeStyle(genre)}">${escHtml(genre)}</span>
+        <p class="meta-text">${escHtml(meta)}</p>
+        ${supplement ? `<p class="supplement-text">${escHtml(supplement)}</p>` : ''}
         <div class="card-footer">
           <span class="supervisor-info">監修: ${escHtml(supervisorInfo)}</span>
           <span class="badge approved-badge">監修済</span>
         </div>
-        <a class="sv-btn" href="${tip.sv_url}" target="_blank" rel="noopener">SV で見る</a>
+        ${svUrl ? `<a class="sv-btn" href="${svUrl}" target="_blank" rel="noopener">SV で見る</a>` : ''}
       </div>
     `;
 
-    // 画像クリックでモーダル
     const img = card.querySelector('.card-image');
     if (img) {
-      img.addEventListener('click', () => openModal(tip.image_url, tip.image_credit));
+      img.addEventListener('click', () => openModal(imageUrl, imageCredit));
     }
 
     container.appendChild(card);
@@ -152,26 +158,36 @@ function renderTable(data) {
 
   const tbody = table.querySelector('tbody');
   data.forEach(tip => {
+    const sup         = tip.supervisor || {};
+    const imageUrl    = tip['画像URL'] || '';
+    const country     = tip['国'] || '';
+    const region      = tip['地域'] || '';
+    const genre       = tip['ジャンル'] || '';
+    const scope       = tip['スコープ'] || '';
+    const meta        = tip['メタ知識'] || '';
+    const svUrl       = tip['参考SVリンク'] || '';
+    const supName     = sup['名前'] || '—';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="td-image">
-        ${tip.image_url
-          ? `<img class="table-thumb" src="${tip.image_url}" alt="" loading="lazy">`
+        ${imageUrl
+          ? `<img class="table-thumb" src="${imageUrl}" alt="" loading="lazy">`
           : `<div class="table-no-image">-</div>`
         }
       </td>
-      <td title="${escHtml(tip.country)}">${tip.flag}</td>
-      <td>${escHtml(tip.region)}</td>
-      <td><span class="badge genre-badge" style="${genreBadgeStyle(tip.genre)}">${escHtml(tip.genre)}</span></td>
-      <td><span class="badge scope-badge" style="${scopeBadgeStyle(tip.scope)}">${tip.scope}</span></td>
-      <td class="td-meta">${escHtml(tip.meta)}</td>
-      <td>${escHtml(tip.supervisor_name)}</td>
-      <td><a class="sv-link" href="${tip.sv_url}" target="_blank" rel="noopener">SV</a></td>
+      <td>${escHtml(country)}</td>
+      <td>${escHtml(region)}</td>
+      <td><span class="badge genre-badge" style="${genreBadgeStyle(genre)}">${escHtml(genre)}</span></td>
+      <td><span class="badge scope-badge" style="${scopeBadgeStyle(scope)}">${escHtml(scope)}</span></td>
+      <td class="td-meta">${escHtml(meta)}</td>
+      <td>${escHtml(supName)}</td>
+      <td>${svUrl ? `<a class="sv-link" href="${svUrl}" target="_blank" rel="noopener">SV</a>` : '—'}</td>
     `;
 
     const img = tr.querySelector('.table-thumb');
     if (img) {
-      img.addEventListener('click', () => openModal(tip.image_url, tip.image_credit));
+      img.addEventListener('click', () => openModal(imageUrl, tip['画像クレジット'] || ''));
     }
 
     tbody.appendChild(tr);
@@ -180,7 +196,6 @@ function renderTable(data) {
   container.appendChild(table);
 }
 
-// --- モーダル ---
 function openModal(url, credit) {
   const modal = document.getElementById('modal');
   document.getElementById('modal-img').src = url;
@@ -196,7 +211,6 @@ document.getElementById('modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
 
-// --- 表示切替 ---
 document.getElementById('btn-card').addEventListener('click', () => {
   viewMode = 'card';
   document.getElementById('btn-card').classList.add('active');
@@ -211,13 +225,11 @@ document.getElementById('btn-table').addEventListener('click', () => {
   render();
 });
 
-// --- フィルター・ソートのイベント ---
 ['search', 'filter-country', 'filter-genre', 'filter-scope', 'sort'].forEach(id => {
   document.getElementById(id).addEventListener('input', render);
   document.getElementById(id).addEventListener('change', render);
 });
 
-// --- XSS対策: HTML特殊文字をエスケープ ---
 function escHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;')

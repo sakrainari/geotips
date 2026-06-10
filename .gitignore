@@ -1,5 +1,6 @@
 # トークンや秘密情報を含む設定ファイル
 js/config.js
+js/confing.js
 
 # GASデプロイURLをコードに書きたくない場合はconfig.jsに記述してここで除外
 # config.jsの例：
