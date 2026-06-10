@@ -83,13 +83,12 @@
       <div class="field">
         <label class="field-label" for="genre">
           ジャンル <span class="required-mark">必須</span>
-          <span class="field-note">ジャンルが無い場合は「ジャンル未登録」を選択し、監修者へのメモにて追加申請してください</span>
+          <span class="field-note">複数選択できます（Ctrl／⌘＋クリック、スマホはタップで複数選択）。ジャンルが無い場合は「ジャンル未登録」を選択し、監修者へのメモにて追加申請してください</span>
         </label>
-        <select id="genre">
-          <option value="">選択してください</option>
-          <!-- register.jsで動的に生成 -->
+        <select id="genre" multiple size="6">
+          <!-- register.jsで動的に生成（複数選択可） -->
         </select>
-        <span class="field-error" id="err-genre">ジャンルを選択してください</span>
+        <span class="field-error" id="err-genre">ジャンルを1つ以上選択してください</span>
       </div>
 
       <!-- メタ知識 -->

@@ -3,8 +3,8 @@
   try {
     const genres = await fetchGenres();
     const sel = document.getElementById('genre');
-    // 既存の静的オプションをクリア（プレースホルダー以外）
-    sel.innerHTML = '<option value="">選択してください</option>';
+    // 複数選択（multiple）なのでプレースホルダーは置かず、全オプションを生成
+    sel.innerHTML = '';
     genres.forEach(g => {
       const opt = document.createElement('option');
       opt.value       = g.ジャンル名;
@@ -50,7 +50,6 @@ function validateForm() {
   const requiredFields = [
     { id: 'poster_name',  errId: 'err-poster_name' },
     { id: 'country',      errId: 'err-country' },
-    { id: 'genre',        errId: 'err-genre' },
     { id: 'meta',         errId: 'err-meta' },
   ];
 
@@ -66,6 +65,18 @@ function validateForm() {
       err.classList.remove('visible');
     }
   });
+
+  // ジャンル（複数選択・1つ以上必須）
+  const genreEl  = document.getElementById('genre');
+  const genreErr = document.getElementById('err-genre');
+  if (getSelectedGenres(genreEl).length === 0) {
+    genreEl.classList.add('error');
+    genreErr.classList.add('visible');
+    isValid = false;
+  } else {
+    genreEl.classList.remove('error');
+    genreErr.classList.remove('visible');
+  }
 
   // スコープ（ラジオ）
   const scopeChecked = document.querySelector('input[name="scope"]:checked');
@@ -113,7 +124,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
     '国':              document.getElementById('country').value.trim(),
     '地域':            document.getElementById('region').value.trim(),
     'スコープ':        document.querySelector('input[name="scope"]:checked').value,
-    'ジャンル':        document.getElementById('genre').value,
+    'ジャンル':        joinGenres(getSelectedGenres(document.getElementById('genre'))),
     'メタ知識':        document.getElementById('meta').value.trim(),
     '補足':            document.getElementById('supplement').value.trim(),
     '参考SVリンク':    document.getElementById('sv_url').value.trim(),

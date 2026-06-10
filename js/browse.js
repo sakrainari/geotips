@@ -15,7 +15,7 @@ let viewMode = 'card';
 
 function populateFilters() {
   const countries = [...new Set(allTips.map(t => t['国']))].sort();
-  const genres    = [...new Set(allTips.map(t => t['ジャンル']))].sort();
+  const genres    = [...new Set(allTips.flatMap(t => splitGenres(t['ジャンル'])))].sort();
 
   const countryEl = document.getElementById('filter-country');
   const genreEl   = document.getElementById('filter-genre');
@@ -49,7 +49,7 @@ function getFiltered() {
     );
   }
   if (country) data = data.filter(t => t['国'] === country);
-  if (genre)   data = data.filter(t => t['ジャンル'] === genre);
+  if (genre)   data = data.filter(t => splitGenres(t['ジャンル']).includes(genre));
   if (scope)   data = data.filter(t => t['スコープ'] === scope);
 
   data.sort((a, b) => {
@@ -113,7 +113,7 @@ function renderCards(data) {
           <span class="badge scope-badge" style="${scopeBadgeStyle(scope)}">${escHtml(scope)}</span>
         </div>
         <div class="region-name">${escHtml(region)}</div>
-        <span class="badge genre-badge" style="${genreBadgeStyle(genre)}">${escHtml(genre)}</span>
+        ${genreBadgesHtml(genre)}
         <p class="meta-text">${escHtml(meta)}</p>
         ${supplement ? `<p class="supplement-text">${escHtml(supplement)}</p>` : ''}
         <div class="card-footer">
@@ -178,7 +178,7 @@ function renderTable(data) {
       </td>
       <td>${escHtml(country)}</td>
       <td>${escHtml(region)}</td>
-      <td><span class="badge genre-badge" style="${genreBadgeStyle(genre)}">${escHtml(genre)}</span></td>
+      <td>${genreBadgesHtml(genre)}</td>
       <td><span class="badge scope-badge" style="${scopeBadgeStyle(scope)}">${escHtml(scope)}</span></td>
       <td class="td-meta">${escHtml(meta)}</td>
       <td>${escHtml(supName)}</td>

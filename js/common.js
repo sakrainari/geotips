@@ -25,6 +25,40 @@ function genreBadgeStyle(genre) {
   return `background:${s.bg};color:${s.color};`;
 }
 
+// ===== 複数ジャンル対応ヘルパー =====
+const GENRE_SEP = '、';
+
+// "標識、車種" → ["標識","車種"]（「、」「,」どちらの区切りも許容・空要素は除去）
+function splitGenres(value) {
+  if (Array.isArray(value)) return value.map(s => String(s).trim()).filter(Boolean);
+  return String(value || '').split(/[、,]/).map(s => s.trim()).filter(Boolean);
+}
+
+// ["標識","車種"] → "標識、車種"
+function joinGenres(arr) {
+  return (arr || []).map(s => String(s).trim()).filter(Boolean).join(GENRE_SEP);
+}
+
+// 複数ジャンルを色付きバッジHTMLにまとめて変換
+function genreBadgesHtml(value) {
+  const esc = s => String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  return splitGenres(value)
+    .map(g => `<span class="badge genre-badge" style="${genreBadgeStyle(g)}">${esc(g)}</span>`)
+    .join(' ');
+}
+
+// multiple selectの選択値を配列で取得
+function getSelectedGenres(selectEl) {
+  return [...selectEl.selectedOptions].map(o => o.value).filter(Boolean);
+}
+
+// 「、」区切り文字列（または配列）に一致するoptionを選択状態にする
+function setSelectedGenres(selectEl, value) {
+  const set = new Set(splitGenres(value));
+  [...selectEl.options].forEach(o => { o.selected = set.has(o.value); });
+}
+
 function scopeBadgeStyle(scope) {
   return scope === "Country"
     ? "background:#3B1FA3;color:#E9D5FF;"

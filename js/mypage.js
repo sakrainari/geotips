@@ -186,7 +186,7 @@ document.getElementById('btn-resubmit').addEventListener('click', async () => {
     国:             document.getElementById('edit-country').value.trim(),
     地域:           document.getElementById('edit-region').value.trim(),
     スコープ:       document.getElementById('edit-scope').value,
-    ジャンル:       document.getElementById('edit-genre').value,
+    ジャンル:       joinGenres(getSelectedGenres(document.getElementById('edit-genre'))),
     メタ知識:       document.getElementById('edit-meta').value.trim(),
     補足:           document.getElementById('edit-supplement').value.trim(),
     参考SVリンク:   document.getElementById('edit-sv-url').value.trim(),
@@ -238,12 +238,14 @@ function statusBadgeHtml(status) {
 function populateEditGenreSelect(selectedValue) {
   const sel = document.getElementById('edit-genre');
   if (!sel) return;
+  // 複数ジャンル対応
+  const currentSet = new Set(splitGenres(selectedValue != null ? selectedValue : getSelectedGenres(sel)));
   sel.innerHTML = '';
   genres.forEach(g => {
     const opt = document.createElement('option');
     opt.value = g.ジャンル名;
     opt.textContent = g.ジャンル名;
-    if (g.ジャンル名 === selectedValue) opt.selected = true;
+    if (currentSet.has(g.ジャンル名)) opt.selected = true;
     sel.appendChild(opt);
   });
 }

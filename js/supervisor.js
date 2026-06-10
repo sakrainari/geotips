@@ -181,13 +181,14 @@ async function loadInitialData() {
 function populateGenreSelect(selectId, genres, selectedValue) {
   const sel = document.getElementById(selectId);
   if (!sel) return;
-  const current = selectedValue || sel.value;
+  // 複数ジャンル対応：明示指定があればそれ、無ければ現在の選択を維持
+  const currentSet = new Set(splitGenres(selectedValue != null ? selectedValue : getSelectedGenres(sel)));
   sel.innerHTML = '';
   genres.forEach(g => {
     const opt = document.createElement('option');
     opt.value       = g.ジャンル名;
     opt.textContent = g.ジャンル名;
-    if (g.ジャンル名 === current) opt.selected = true;
+    if (currentSet.has(g.ジャンル名)) opt.selected = true;
     sel.appendChild(opt);
   });
 }
@@ -361,7 +362,7 @@ function openEditModal(id) {
   document.getElementById('edit-country').value     = item.国 || '';
   document.getElementById('edit-region').value      = item.地域 || '';
   document.getElementById('edit-scope').value       = item.スコープ || '';
-  document.getElementById('edit-genre').value       = item.ジャンル || '';
+  setSelectedGenres(document.getElementById('edit-genre'), item.ジャンル);
   document.getElementById('edit-meta').value        = item.メタ知識 || '';
   document.getElementById('edit-supplement').value  = item.補足 || '';
   document.getElementById('edit-sv-url').value      = item.参考SVリンク || '';
@@ -413,7 +414,7 @@ function collectEditFields() {
     国:               document.getElementById('edit-country').value.trim(),
     地域:             document.getElementById('edit-region').value.trim(),
     スコープ:         document.getElementById('edit-scope').value,
-    ジャンル:         document.getElementById('edit-genre').value,
+    ジャンル:         joinGenres(getSelectedGenres(document.getElementById('edit-genre'))),
     メタ知識:         document.getElementById('edit-meta').value.trim(),
     補足:             document.getElementById('edit-supplement').value.trim(),
     参考SVリンク:     document.getElementById('edit-sv-url').value.trim(),
