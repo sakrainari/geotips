@@ -222,6 +222,7 @@ function renderPendingTable() {
       <td>${statusBadgeHtml(item.公開ステータス)}</td>
       <td class="td-actions">
         <button class="btn btn-sm btn-primary" onclick="openEditModal('pending','${escHtml(item.id)}')">監修する</button>
+        ${state.mode === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="confirmDelete('${escHtml(item.id)}')">削除</button>` : ''}
       </td>
     </tr>
   `).join('');
@@ -258,6 +259,7 @@ function renderApprovedTable() {
       <td>${escHtml(supName)}</td>
       <td class="td-actions">
         <button class="btn btn-sm btn-edit" onclick="openEditModal('approved','${escHtml(item.id || '')}')">詳細</button>
+        ${state.mode === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="confirmDelete('${escHtml(item.id || '')}')">削除</button>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -340,6 +342,7 @@ async function confirmDelete(id) {
     showToast('削除しました');
     await loadAllData();
     await loadPending();
+    await loadApproved();
   } catch (e) { alert('エラー: ' + e.message); }
 }
 
