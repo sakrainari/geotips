@@ -5,9 +5,11 @@ const state = {
   token:       null,
   mode:        null,  // 'supervisor' | 'admin'
   pending:     [],
+  approvedData: [],
   allData:     [],
   supervisors: [],
   genres:      [],
+  pendingView: 'before',  // 'before' | 'done'
   currentEdit:       null,
   currentSupEdit:    null,
   currentGenreEdit:  null,
@@ -147,6 +149,7 @@ async function loadInitialData() {
   }
 
   await loadPending();
+  loadApproved(); // バックグラウンドで取得
 
   if (state.mode === 'admin') {
     loadAllData();     // バックグラウンドで取得
@@ -164,11 +167,40 @@ async function loadPending() {
   wrap.innerHTML = '<p class="loading-text">読み込み中...</p>';
   try {
     state.pending = await fetchPendingData(state.token);
-    renderPendingTable();
+    renderCurrentSubTab();
   } catch (e) {
     wrap.innerHTML = `<p class="error-text">読み込みエラー: ${escHtml(e.message)}</p>`;
   }
 }
+
+async function loadApproved() {
+  try {
+    state.approvedData = await fetchPublicData();
+    if (state.pendingView === 'done') renderApprovedTable();
+  } catch (e) {
+    console.warn('監修済データ取得失敗:', e.message);
+  }
+}
+
+function reloadPendingTab() {
+  if (state.pendingView === 'before') loadPending();
+  else loadApproved().then(() => renderApprovedTable());
+}
+
+function renderCurrentSubTab() {
+  if (state.pendingView === 'before') renderPendingTable();
+  else renderApprovedTable();
+}
+
+// サブタブ切替
+document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.pendingView = btn.dataset.sub;
+    renderCurrentSubTab();
+  });
+});
 
 function renderPendingTable() {
   const wrap = document.getElementById('pending-table-wrap');
@@ -199,6 +231,41 @@ function renderPendingTable() {
       <th>ID</th><th>投稿者名</th><th>国</th><th>地域</th>
       <th>ジャンル</th><th>スコープ</th><th>メタ知識</th>
       <th>登録日</th><th>ステータス</th><th>操作</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderApprovedTable() {
+  const wrap = document.getElementById('pending-table-wrap');
+  if (!state.approvedData.length) {
+    wrap.innerHTML = '<p class="empty-text">監修済データがありません（読み込み中の場合はしばらくお待ちください）</p>';
+    return;
+  }
+
+  const rows = state.approvedData.map(item => {
+    const sup = item.supervisor || {};
+    const supName = sup['名前'] || item.監修者名 || '—';
+    return `
+    <tr>
+      <td>${escHtml(item.id || '')}</td>
+      <td>${escHtml(item['国'] || '')}</td>
+      <td>${escHtml(item['地域'] || '')}</td>
+      <td>${escHtml(item['ジャンル'] || '')}</td>
+      <td>${escHtml(item['スコープ'] || '')}</td>
+      <td class="td-meta-short">${escHtml((item['メタ知識'] || '').slice(0, 40))}${(item['メタ知識'] || '').length > 40 ? '…' : ''}</td>
+      <td>${escHtml(item['登録日'] || '')}</td>
+      <td>${escHtml(supName)}</td>
+      <td class="td-actions">
+        <button class="btn btn-sm btn-edit" onclick="openEditModal('approved','${escHtml(item.id || '')}')">詳細</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `<div class="admin-table-wrap"><table class="admin-table">
+    <thead><tr>
+      <th>ID</th><th>国</th><th>地域</th><th>ジャンル</th><th>スコープ</th>
+      <th>メタ知識</th><th>登録日</th><th>監修者</th><th>操作</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
@@ -389,7 +456,9 @@ async function blockRegistrant(name) {
 function openEditModal(context, id) {
   const item = context === 'pending'
     ? state.pending.find(d => d.id === id)
-    : state.allData.find(d => d.id === id);
+    : context === 'approved'
+      ? state.approvedData.find(d => d.id === id)
+      : state.allData.find(d => d.id === id);
   if (!item) return;
 
   state.currentEdit = { item, context };

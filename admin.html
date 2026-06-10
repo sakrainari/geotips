@@ -50,8 +50,12 @@
   <!-- ===== タブ1：監修待ち一覧 ===== -->
   <div id="tab-pending" class="tab-panel hidden">
     <div class="tab-header">
-      <h2>監修待ち一覧</h2>
-      <button class="btn btn-sm btn-muted" onclick="loadPending()">再読み込み</button>
+      <h2>監修一覧</h2>
+      <div class="sub-tab-bar">
+        <button class="sub-tab-btn active" data-sub="before">監修前</button>
+        <button class="sub-tab-btn" data-sub="done">監修済</button>
+      </div>
+      <button class="btn btn-sm btn-muted" onclick="reloadPendingTab()">再読み込み</button>
     </div>
     <div id="pending-table-wrap"></div>
   </div>
